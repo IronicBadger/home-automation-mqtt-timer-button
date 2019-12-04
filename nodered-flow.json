@@ -1,0 +1,757 @@
+[
+    {
+        "id": "19bc5ab9.bdba2d",
+        "type": "tab",
+        "label": "Soldering Button",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "7030b443.95032c",
+        "type": "inject",
+        "z": "19bc5ab9.bdba2d",
+        "name": "Setup",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 210,
+        "y": 620,
+        "wires": [
+            [
+                "7b35bb8b.be8e34"
+            ]
+        ]
+    },
+    {
+        "id": "7b35bb8b.be8e34",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "currentTime",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "solderState",
+                "pt": "flow",
+                "to": "stopped",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "timeRemaining",
+                "pt": "flow",
+                "to": "300000",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "timeIncrement",
+                "pt": "flow",
+                "to": "90000",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "buttonSinglePress",
+                "pt": "flow",
+                "to": "false",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ccb266bf.de1c6",
+        "type": "inject",
+        "z": "19bc5ab9.bdba2d",
+        "name": "Loop",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "x": 210,
+        "y": 440,
+        "wires": [
+            [
+                "e811b905.077538"
+            ]
+        ]
+    },
+    {
+        "id": "e811b905.077538",
+        "type": "function",
+        "z": "19bc5ab9.bdba2d",
+        "name": "Timer Logic",
+        "func": "var currentTime = msg.payload;\nvar lastTickTime = flow.get(\"lastTickTime\") || currentTime;\nvar timeRemaining = flow.get(\"timeRemaining\") || 0;\nvar solderState = flow.get(\"solderState\");\nvar timeIncrement = flow.get(\"timeIncrement\");\nvar buttonSinglePress = flow.get(\"buttonSinglePress\");\n\nif(solderState == \"running\") {\n    timeRemaining -= (currentTime - lastTickTime);\n    if(buttonSinglePress) {\n        timeRemaining += timeIncrement;\n        flow.set(\"buttonSinglePress\", false);\n    }\n    flow.set(\"timeRemaining\", timeRemaining);\n}\n\nif(timeRemaining <= 1000) {\n    solderState = \"stopped\";\n    flow.set(\"solderState\", solderState);\n}\n\n\n\nmsg.timeRemaining = timeRemaining;\nflow.set(\"lastTickTime\", currentTime);\n\nnode.status({fill:\"green\", shape:\"box\", text:solderState});\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 440,
+        "wires": [
+            [
+                "da0a10a0.fdbb68",
+                "3da91872.46cd4"
+            ]
+        ]
+    },
+    {
+        "id": "e6b31b28.5f0b2",
+        "type": "inject",
+        "z": "19bc5ab9.bdba2d",
+        "name": "start",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 790,
+        "y": 220,
+        "wires": [
+            [
+                "c32bc5f0.63b7f"
+            ]
+        ]
+    },
+    {
+        "id": "c32bc5f0.63b7f",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "running",
+        "rules": [
+            {
+                "t": "set",
+                "p": "solderState",
+                "pt": "flow",
+                "to": "running",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 220,
+        "wires": [
+            [
+                "2884d4dd.ed8074"
+            ]
+        ]
+    },
+    {
+        "id": "238a0315.3f6784",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "stopped",
+        "rules": [
+            {
+                "t": "set",
+                "p": "solderState",
+                "pt": "flow",
+                "to": "stopped",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 260,
+        "wires": [
+            [
+                "6c0bdbc2.be6494"
+            ]
+        ]
+    },
+    {
+        "id": "3fc32f40.d5324",
+        "type": "inject",
+        "z": "19bc5ab9.bdba2d",
+        "name": "stop",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 790,
+        "y": 260,
+        "wires": [
+            [
+                "238a0315.3f6784"
+            ]
+        ]
+    },
+    {
+        "id": "13d08cd4.6802ab",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timeRemaining",
+                "pt": "flow",
+                "to": "timeIncrement",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 950,
+        "y": 300,
+        "wires": [
+            [
+                "ac14243d.db81"
+            ]
+        ]
+    },
+    {
+        "id": "33a97b76.7bd894",
+        "type": "inject",
+        "z": "19bc5ab9.bdba2d",
+        "name": "reset",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 790,
+        "y": 300,
+        "wires": [
+            [
+                "13d08cd4.6802ab"
+            ]
+        ]
+    },
+    {
+        "id": "2a47a32b.b32874",
+        "type": "function",
+        "z": "19bc5ab9.bdba2d",
+        "name": "Format Time",
+        "func": "var t = msg.timeRemaining / 1000;\nvar h = Math.floor(t/3600);\nvar m = Math.floor(t%3600 / 60);\nvar s = Math.floor(t%3600 % 60);\n\n// ensure leading zeroes\nmsg.formattedTimeRemaining = (\"0\" + m).slice(-2) + \":\" + (\"0\" + s).slice(-2);\nmsg.payload = msg.formattedTimeRemaining;\nnode.status({fill:\"blue\", shape:\"dot\", text:msg.formattedTimeRemaining});\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 970,
+        "y": 620,
+        "wires": [
+            [
+                "8016f1ab.72565"
+            ]
+        ]
+    },
+    {
+        "id": "6c0bdbc2.be6494",
+        "type": "link out",
+        "z": "19bc5ab9.bdba2d",
+        "name": "on solder stop",
+        "links": [],
+        "x": 1075,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "2884d4dd.ed8074",
+        "type": "link out",
+        "z": "19bc5ab9.bdba2d",
+        "name": "on solder running",
+        "links": [],
+        "x": 1075,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "ac14243d.db81",
+        "type": "link out",
+        "z": "19bc5ab9.bdba2d",
+        "name": "on solder reset",
+        "links": [],
+        "x": 1075,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "da0a10a0.fdbb68",
+        "type": "switch",
+        "z": "19bc5ab9.bdba2d",
+        "name": "Time's Up",
+        "property": "solderState",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "stopped",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "running",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 600,
+        "y": 440,
+        "wires": [
+            [
+                "9cf6a603.727e38"
+            ],
+            [
+                "5925541a.c5c464"
+            ]
+        ]
+    },
+    {
+        "id": "9625e121.736f08",
+        "type": "api-call-service",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "server": "92e2229d.d0997",
+        "version": 1,
+        "debugenabled": false,
+        "service_domain": "switch",
+        "service": "turn_off",
+        "entityId": "switch.sp20_solderingiron",
+        "data": "",
+        "dataType": "json",
+        "mergecontext": "",
+        "output_location": "",
+        "output_location_type": "none",
+        "mustacheAltTags": false,
+        "x": 1270,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "14786ede.3a3431",
+        "type": "api-call-service",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "server": "92e2229d.d0997",
+        "version": 1,
+        "debugenabled": false,
+        "service_domain": "switch",
+        "service": "turn_on",
+        "entityId": "switch.sp20_solderingiron",
+        "data": "",
+        "dataType": "json",
+        "mergecontext": "",
+        "output_location": "",
+        "output_location_type": "none",
+        "mustacheAltTags": false,
+        "x": 1270,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9f4ea1cd.c8f06",
+        "type": "rbe",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "func": "rbei",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "solderStateEvent",
+        "x": 950,
+        "y": 440,
+        "wires": [
+            [
+                "19d699b0.4afe76",
+                "13604947.9edfd7"
+            ]
+        ]
+    },
+    {
+        "id": "5925541a.c5c464",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "running (2)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "solderStateEvent",
+                "pt": "msg",
+                "to": "2",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 779,
+        "y": 468,
+        "wires": [
+            [
+                "9f4ea1cd.c8f06"
+            ]
+        ]
+    },
+    {
+        "id": "9cf6a603.727e38",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "stopped (1)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "solderStateEvent",
+                "pt": "msg",
+                "to": "1",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 779,
+        "y": 408,
+        "wires": [
+            [
+                "9f4ea1cd.c8f06"
+            ]
+        ]
+    },
+    {
+        "id": "19d699b0.4afe76",
+        "type": "switch",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "property": "solderStateEvent",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1090,
+        "y": 440,
+        "wires": [
+            [
+                "9625e121.736f08",
+                "98e89c9b.f0298"
+            ],
+            [
+                "14786ede.3a3431"
+            ]
+        ]
+    },
+    {
+        "id": "2a6e8395.e636b4",
+        "type": "inject",
+        "z": "19bc5ab9.bdba2d",
+        "name": "buttonSP",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 800,
+        "y": 160,
+        "wires": [
+            [
+                "c38ffaa8.dba6b"
+            ]
+        ]
+    },
+    {
+        "id": "c38ffaa8.dba6b",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "add time",
+        "rules": [
+            {
+                "t": "set",
+                "p": "buttonSinglePress",
+                "pt": "flow",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 160,
+        "wires": [
+            [
+                "9039e2c5.44db5"
+            ]
+        ]
+    },
+    {
+        "id": "98e89c9b.f0298",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "timeRemaining",
+                "pt": "flow",
+                "to": "timeIncrement",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1230,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9039e2c5.44db5",
+        "type": "link out",
+        "z": "19bc5ab9.bdba2d",
+        "name": "on solder addTime",
+        "links": [],
+        "x": 1075,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "8016f1ab.72565",
+        "type": "mqtt out",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "topic": "nodered/solderTimeRemaining",
+        "qos": "1",
+        "retain": "true",
+        "broker": "cfefdaa7.2229d",
+        "x": 1230,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "13604947.9edfd7",
+        "type": "change",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "solderState",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 990,
+        "y": 560,
+        "wires": [
+            [
+                "21bc1052.a6f96"
+            ]
+        ]
+    },
+    {
+        "id": "21bc1052.a6f96",
+        "type": "mqtt out",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "topic": "nodered/solderState",
+        "qos": "1",
+        "retain": "true",
+        "broker": "cfefdaa7.2229d",
+        "x": 1260,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "3da91872.46cd4",
+        "type": "rbe",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "timeRemaining",
+        "x": 790,
+        "y": 620,
+        "wires": [
+            [
+                "2a47a32b.b32874"
+            ]
+        ]
+    },
+    {
+        "id": "8cdb8e41.8a787",
+        "type": "switch",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "property": "solderState",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "stopped",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "running",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 570,
+        "y": 180,
+        "wires": [
+            [
+                "c32bc5f0.63b7f"
+            ],
+            [
+                "c38ffaa8.dba6b"
+            ]
+        ]
+    },
+    {
+        "id": "50a260bd.1b9bd8",
+        "type": "mqtt in",
+        "z": "19bc5ab9.bdba2d",
+        "name": "buttonClick",
+        "topic": "mqttswitch_solder/buttonClick",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "cfefdaa7.2229d",
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "1a2cb969.759517"
+            ]
+        ]
+    },
+    {
+        "id": "1a2cb969.759517",
+        "type": "switch",
+        "z": "19bc5ab9.bdba2d",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "short",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "long",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 390,
+        "y": 300,
+        "wires": [
+            [
+                "8cdb8e41.8a787"
+            ],
+            [
+                "238a0315.3f6784",
+                "13d08cd4.6802ab"
+            ]
+        ]
+    },
+    {
+        "id": "92e2229d.d0997",
+        "type": "server",
+        "z": "",
+        "name": "Home Assistant"
+    },
+    {
+        "id": "cfefdaa7.2229d",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "192.168.1.17",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]
